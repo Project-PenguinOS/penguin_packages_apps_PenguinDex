@@ -1,0 +1,18 @@
+//
+// Copyright (C) 2026 The PenguinOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+android_app {
+    name: "PenguinDex",
+    srcs: ["src/**/*.kt"],
+    resource_dirs: ["res"],
+    platform_apis: true,
+    certificate: "platform",
+    privileged: true,
+    system_ext_specific: true,
+    static_libs: ["kotlin-stdlib"],
+    optimize: {
+        enabled: false,
+    },
+}

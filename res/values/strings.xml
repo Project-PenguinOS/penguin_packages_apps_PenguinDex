@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The PenguinOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string name="app_name">DeX</string>
+    <!-- Notification channel for DeX -->
+    <string name="channel_dex">DeX</string>
+    <!-- Notification shown while a DeX desktop is on a connected screen -->
+    <string name="dex_running_title">DeX is running</string>
+    <string name="dex_running_text">Tap to use your phone as a touchpad</string>
+    <!-- Touchpad -->
+    <string name="touchpad_hint">Move one finger to move the pointer. Tap to click, tap with two fingers to right click, drag with two fingers to scroll, double tap and drag to move things.</string>
+    <string name="touchpad_left">Left click</string>
+    <string name="touchpad_right">Right click</string>
+    <string name="touchpad_no_display">Connect a screen to use DeX</string>
+</resources>
