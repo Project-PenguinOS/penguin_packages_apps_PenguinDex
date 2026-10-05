@@ -8,6 +8,7 @@
     android:sharedUserId="android.uid.system">
 
     <uses-permission android:name="android.permission.INJECT_EVENTS" />
+    <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -25,9 +26,11 @@
             </intent-filter>
         </receiver>
 
+        <!-- Exported to SystemUI, which shares the system uid, for the Control Centre. -->
         <service
             android:name=".DexService"
-            android:exported="false" />
+            android:exported="true"
+            android:permission="android.permission.STATUS_BAR_SERVICE" />
 
         <activity
             android:name=".TouchpadActivity"

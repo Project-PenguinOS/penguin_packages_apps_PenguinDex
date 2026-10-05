@@ -15,4 +15,19 @@
     <string name="touchpad_left">Left click</string>
     <string name="touchpad_right">Right click</string>
     <string name="touchpad_no_display">Connect a screen to use DeX</string>
+    <!-- DeX Control Centre -->
+    <string name="cc_settings">Settings</string>
+    <string name="cc_wifi">Wi-Fi</string>
+    <string name="cc_bluetooth">Bluetooth</string>
+    <string name="cc_airplane">Airplane mode</string>
+    <string name="cc_dnd">Do Not Disturb</string>
+    <string name="cc_dark">Dark theme</string>
+    <string name="cc_screenshot">Screenshot</string>
+    <string name="cc_torch">Torch</string>
+    <string name="cc_saver">Battery Saver</string>
+    <string name="cc_display">Display</string>
+    <string name="cc_sound">Sound</string>
+    <string name="cc_not_playing">Not Playing</string>
+    <string name="cc_on">On</string>
+    <string name="cc_off">Off</string>
 </resources>

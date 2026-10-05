@@ -12,10 +12,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.database.ContentObserver
 import android.hardware.display.DisplayManager
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.Settings
 import android.view.Display
 
 /** Offers the touchpad for as long as a DeX desktop is on a connected screen. */
@@ -23,6 +25,11 @@ class DexService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var notifications: NotificationManager
+
+    private val touchpadObserver =
+        object : ContentObserver(handler) {
+            override fun onChange(selfChange: Boolean) = update()
+        }
 
     private val displayListener =
         object : DisplayManager.DisplayListener {
@@ -40,13 +47,38 @@ class DexService : Service() {
             NotificationChannel(CHANNEL, getString(R.string.channel_dex), NotificationManager.IMPORTANCE_LOW)
         )
         getSystemService(DisplayManager::class.java).registerDisplayListener(displayListener, handler)
+        contentResolver.registerContentObserver(
+            Settings.Secure.getUriFor(TOUCHPAD),
+            false,
+            touchpadObserver,
+        )
         update()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+    private val controlCentres = mutableMapOf<Int, ControlCentre>()
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_CONTROL_CENTRE) {
+            toggleControlCentre(intent.getIntExtra(EXTRA_DISPLAY, Display.INVALID_DISPLAY))
+        }
+        return START_STICKY
+    }
+
+    /** Opens the Control Centre on a DeX screen, or closes it if it's open there. */
+    private fun toggleControlCentre(displayId: Int) {
+        controlCentres[displayId]?.let {
+            it.dismiss()
+            return
+        }
+        val display = getSystemService(DisplayManager::class.java).getDisplay(displayId) ?: return
+        val centre = ControlCentre(createDisplayContext(display)) { controlCentres.remove(displayId) }
+        controlCentres[displayId] = centre
+        centre.show()
+    }
 
     override fun onDestroy() {
         getSystemService(DisplayManager::class.java).unregisterDisplayListener(displayListener)
+        contentResolver.unregisterContentObserver(touchpadObserver)
         super.onDestroy()
     }
 
@@ -55,7 +87,9 @@ class DexService : Service() {
     private fun update() {
         // The window manager settles a new screen's desktop a moment after it is added.
         handler.postDelayed({
-            if (dexDisplays(this).isEmpty()) {
+            // Penguin Laboratory can turn the touchpad off.
+            val wanted = Settings.Secure.getInt(contentResolver, TOUCHPAD, 1) != 0
+            if (!wanted || dexDisplays(this).isEmpty()) {
                 notifications.cancel(NOTIFICATION)
                 return@postDelayed
             }
@@ -84,8 +118,12 @@ class DexService : Service() {
         }, 600)
     }
 
-    private companion object {
-        const val CHANNEL = "dex"
-        const val NOTIFICATION = 1
+    companion object {
+        /** SystemUI's request, from a DeX screen's status bar, for its Control Centre. */
+        const val ACTION_CONTROL_CENTRE = "com.penguin.dex.action.CONTROL_CENTRE"
+        const val EXTRA_DISPLAY = "display"
+        private const val TOUCHPAD = "penguin_dex_touchpad"
+        private const val CHANNEL = "dex"
+        private const val NOTIFICATION = 1
     }
 }
