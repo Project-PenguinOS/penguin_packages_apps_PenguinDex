@@ -106,7 +106,15 @@ class ControlCentre(displayContext: Context, private val onClosed: () -> Unit) {
                     windowAnimations = 0
                 }
         windowManager.addView(root, lp)
-        root.post { applyGlass() }
+        // Glass goes on once the tiles have their sizes.
+        root.viewTreeObserver.addOnGlobalLayoutListener(
+            object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    applyGlass()
+                }
+            }
+        )
         // Springs open from the status bar's corner.
         root.alpha = 0f
         root.scaleX = 0.9f
@@ -140,6 +148,8 @@ class ControlCentre(displayContext: Context, private val onClosed: () -> Unit) {
         init {
             orientation = VERTICAL
             isFocusableInTouchMode = true
+            // Focused for Escape, without Android's grey focus highlight over the whole panel.
+            defaultFocusHighlightEnabled = false
             clipChildren = false
             clipToPadding = false
             // Room for the tiles' shadows inside the window.
@@ -670,7 +680,14 @@ class ControlCentre(displayContext: Context, private val onClosed: () -> Unit) {
             }
             layers += sheen
             layers += GlassEdge(radius, dp(1).toFloat())
-            view.background = LayerDrawable(layers.toTypedArray())
+            val glass = LayerDrawable(layers.toTypedArray())
+            view.background = glass
+            // A blur with no size yet blurs the whole window, so size it now and keep it sized.
+            glass.setBounds(0, 0, view.width, view.height)
+            view.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+                v.background?.setBounds(0, 0, v.width, v.height)
+            }
+            view.invalidate()
         }
     }
 
