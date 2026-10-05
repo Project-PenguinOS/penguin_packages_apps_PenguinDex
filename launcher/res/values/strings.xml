@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The PenguinOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <!-- DeX Launchpad: the search field over the apps -->
+    <string name="penguin_dex_launchpad_search">Search</string>
+</resources>

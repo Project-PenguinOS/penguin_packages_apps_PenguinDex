@@ -16,3 +16,14 @@ android_app {
         enabled: false,
     },
 }
+
+// DeX's look for the launcher on a connected screen: its dock and Launchpad. Launcher3 calls
+// into it from a few hooks.
+android_library {
+    name: "PenguinDexLauncher",
+    srcs: ["launcher/src/**/*.kt"],
+    resource_dirs: ["launcher/res"],
+    manifest: "launcher/AndroidManifest.xml",
+    platform_apis: true,
+    min_sdk_version: "current",
+}
